@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HK + Malaysia Trip — May 2026</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #ffffff; color: #2d2d2d; font-size: 14px; }
+  #map { background: #ffffff; }
+
+  .hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: white;
+    padding: 48px 40px 36px;
+    text-align: center;
+  }
+  .hero h1 { font-size: 2.4rem; font-weight: 300; letter-spacing: 2px; }
+  .hero .subtitle { font-size: 0.95rem; opacity: 0.5; letter-spacing: 4px; text-transform: uppercase; margin-top: 6px; }
+
+  .legend {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    padding: 20px;
+    flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 0.8rem; color: #666; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-flight { background: #dc2626; }
+  .dot-hk { background: #6366f1; }
+  .dot-kl { background: #38bdf8; }
+  .dot-malacca { background: #ea580c; }
+  .dot-penang { background: #059669; }
+  .dot-empty { background: #e0e0e0; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 20px 40px; }
+
+  .week-label {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #aaa;
+    font-weight: 600;
+    margin: 24px 0 8px 4px;
+  }
+
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .cal-header {
+    text-align: center;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #999;
+    font-weight: 700;
+    padding: 8px 0;
+  }
+
+  .cal-day {
+    background: white;
+    border-radius: 12px;
+    min-height: 160px;
+    padding: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    position: relative;
+    border-top: 4px solid transparent;
+    transition: transform 0.15s;
+  }
+  .cal-day:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  .cal-day.trip:hover { outline: 2px solid var(--city-color); }
+
+  .cal-day.empty { background: #f5f5f2; opacity: 0.5; min-height: 160px; }
+  .cal-day.trip { border-top-color: var(--city-color); }
+  .cal-day.city-flight { --city-color: #dc2626; background: #fef2f2; }
+  .cal-day.city-hk { --city-color: #6366f1; background: #f8f7ff; }
+  .cal-day.city-kl { --city-color: #38bdf8; background: #f0f9ff; }
+  .cal-day.city-malacca { --city-color: #ea580c; background: #fffbf7; }
+  .cal-day.city-penang { --city-color: #059669; background: #f5fdf9; }
+
+  .day-date {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #ccc;
+    margin-bottom: 4px;
+  }
+  .cal-day.trip .day-date { color: var(--city-color); }
+
+  .day-tag {
+    display: inline-block;
+    background: var(--city-color);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .day-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+  }
+
+  .event {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 4px;
+    padding-left: 10px;
+    position: relative;
+    line-height: 1.4;
+  }
+  .event::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--city-color, #ccc);
+  }
+
+  .food-tag {
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e;
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  .flight-tag {
+    display: inline-block;
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  .transport-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 6px;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 32px;
+    color: #ccc;
+    font-size: 0.75rem;
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 40px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e5e5e5;
+  }
+
+  .food-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .food-card {
+    background: white;
+    border-radius: 10px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border-left: 4px solid #ddd;
+  }
+  .food-card.fhk { border-left-color: #6366f1; }
+  .food-card.fkl { border-left-color: #38bdf8; }
+  .food-card.fpen { border-left-color: #059669; }
+
+  .food-region {
+    font-size: 14px;
+    font-weight: 700;
+    color: #666;
+    margin: 20px 0 10px 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .food-region:first-child { margin-top: 0; }
+  .food-region .fr-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .food-card .food-img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; }
+  .food-card .food-icon { width: 100%; height: 120px; border-radius: 8px; margin-bottom: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #f8f7ff 0%, #ede9fe 100%); text-align: center; gap: 4px; }
+  .food-card.fkl .food-icon { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); }
+  .food-card.fpen .food-icon { background: linear-gradient(135deg, #f5fdf9 0%, #d1fae5 100%); }
+  .food-icon .icon-emoji { font-size: 2.5rem; line-height: 1; }
+  .food-icon .icon-label { font-size: 11px; font-weight: 600; color: #666; }
+  .food-icon .icon-label-cn { font-size: 14px; font-weight: 700; color: #444; }
+  .food-card .dish { font-weight: 700; font-size: 16px; margin-bottom: 2px; }
+  .food-card .where { font-size: 12px; color: #999; }
+
+  .list-view { margin-bottom: 32px; }
+  .list-item {
+    background: white;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border-left: 4px solid var(--city-color, #ccc);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    transition: transform 0.15s;
+  }
+  .list-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); outline: 2px solid var(--city-color); cursor: pointer; }
+  .list-item.active { outline: 3px solid var(--city-color); }
+  .cal-day.trip { cursor: pointer; }
+  .cal-day.active { outline: 3px solid var(--city-color); }
+  .list-date-tag { font-size: 12px; color: var(--city-color); font-weight: 700; }
+  .list-content .list-title { font-weight: 700; font-size: 16px; }
+  .list-content .list-desc { font-size: 14px; color: #666; line-height: 1.5; }
+
+  .hotel-tag {
+    display: inline-block;
+    background: #ede9fe;
+    color: #5b21b6;
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  .flight-info {
+    background: white;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border-left: 4px solid #dc2626;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .flight-info .route { font-weight: 700; font-size: 16px; }
+  .flight-info .details { font-size: 14px; color: #666; }
+  .flight-info .flight-num { font-size: 12px; color: #dc2626; font-weight: 700; }
+
+  .toggle-details {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    color: #6366f1;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 0 0;
+    transition: color 0.2s;
+  }
+  .toggle-details:hover { color: #4338ca; }
+  .toggle-details .arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    font-size: 9px;
+  }
+  .toggle-details .arrow.open { transform: rotate(90deg); }
+
+  .expandable {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.35s ease,
+                transform 0.35s ease;
+  }
+  .expandable.open {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .expandable .cw-stop,
+  .expandable .cw-period,
+  .expandable .cw-tips {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .expandable.open .cw-stop,
+  .expandable.open .cw-period,
+  .expandable.open .cw-tips {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .city-walk { margin-top: 14px; padding-top: 14px; border-top: 1px solid #e0d9f7; }
+  .cw-period {
+    font-size: 13px;
+    font-weight: 700;
+    color: #6366f1;
+    margin: 14px 0 8px;
+    padding-bottom: 3px;
+    border-bottom: 2px solid #ede9fe;
+  }
+  .cw-period:first-child { margin-top: 0; }
+  .cw-stop { display: flex; gap: 10px; margin-bottom: 10px; padding-left: 2px; }
+  .cw-time { font-size: 12px; font-weight: 600; color: #6366f1; min-width: 42px; padding-top: 1px; }
+  .cw-name { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+  .cw-name .cn { color: #999; font-weight: 400; }
+  .cw-desc { font-size: 12px; color: #666; line-height: 1.5; }
+  .cw-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-top: 3px;
+  }
+  .cw-museum  { background: #e8f4fd; color: #1a73e8; }
+  .cw-food    { background: #fef3c7; color: #92400e; }
+  .cw-culture { background: #e8f5e9; color: #2e7d32; }
+  .cw-walk    { background: #f3e8fd; color: #6366f1; }
+
+  .cw-tips {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #f8f7ff;
+    border-radius: 8px;
+    border: 1px solid #ede9fe;
+  }
+  .cw-tips-title { font-size: 12px; font-weight: 700; color: #6366f1; margin-bottom: 4px; }
+  .cw-tips ul { padding-left: 16px; margin: 0; }
+  .cw-tips li { font-size: 12px; color: #666; margin-bottom: 2px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Hong Kong + Malaysia</h1>
+  <div class="subtitle">Apr 30 – May 10, 2026 &nbsp;·&nbsp; SFO → Hong Kong → Kuala Lumpur → Penang → Hong Kong → SFO</div>
+</div>
+
+<div class="container">
+
+  <!-- Calendar Headers -->
+  <div class="calendar">
+    <div class="cal-header">Sun</div>
+    <div class="cal-header">Mon</div>
+    <div class="cal-header">Tue</div>
+    <div class="cal-header">Wed</div>
+    <div class="cal-header">Thu</div>
+    <div class="cal-header">Fri</div>
+    <div class="cal-header">Sat</div>
+  </div>
+
+  <!-- Week 1: Sun Apr 26 – Sat May 2 -->
+  <div class="week-label">Week of April 26</div>
+  <div class="calendar">
+    <div class="cal-day empty"><div class="day-date">26</div></div>
+    <div class="cal-day empty"><div class="day-date">27</div></div>
+    <div class="cal-day empty"><div class="day-date">28</div></div>
+    <div class="cal-day empty"><div class="day-date">29</div></div>
+
+    <!-- Wed Apr 30 — Depart SFO -->
+    <div class="cal-day trip city-flight" onclick="flyTo('sfo')">
+      <div class="day-date">30</div>
+      <div class="day-tag">✈ Flight</div>
+      <div class="day-title">SFO → HKG</div>
+      <div class="event">CX873 departs 00:20</div>
+      <div class="event">14h 55m flight</div>
+      <div class="flight-tag">Seat 52C</div>
+    </div>
+
+    <!-- Thu May 1 — Arrive HK -->
+    <div class="cal-day trip city-hk" onclick="flyTo('hk')">
+      <div class="day-date">1</div>
+      <div class="day-tag">Hong Kong</div>
+      <div class="day-title">Arrive HK 06:15</div>
+      <div class="event">Land at HKG Terminal 1</div>
+      <div class="event">Check in, rest, explore</div>
+      <div class="hotel-tag">🏨 Harbour Grand HK</div>
+      <div style="font-size:0.65rem; color:#aaa; margin-top:4px;">May</div>
+    </div>
+
+    <!-- Fri May 2 — HK Day 2 -->
+    <div class="cal-day trip city-hk" onclick="flyTo('hk')">
+      <div class="day-date">2</div>
+      <div class="day-tag">Hong Kong</div>
+      <div class="day-title">HK Day 2</div>
+      <div class="event">Culture + nature day</div>
+      <div class="hotel-tag">🏨 Harbour Grand HK</div>
+    </div>
+  </div>
+
+  <!-- Week 2: Sun May 3 – Sat May 9 (TRIP WEEK) -->
+  <div class="week-label">Week of May 3 — Malaysia Trip</div>
+  <div class="calendar">
+    <!-- Sun May 3 — HK Day 3 / Macau Day Trip -->
+    <div class="cal-day trip city-hk" onclick="flyTo('hk')">
+      <div class="day-date">3</div>
+      <div class="day-tag">HK / Macau</div>
+      <div class="day-title">Macau Day Trip</div>
+      <div class="event">Ferry → UNESCO Historic Centre</div>
+      <div class="event">Museums · Portuguese food</div>
+      <div class="hotel-tag">🏨 Harbour Grand HK</div>
+    </div>
+
+    <!-- Mon May 4 — Day 1 KL -->
+    <div class="cal-day trip city-kl" onclick="flyTo('kl')">
+      <div class="day-date">4</div>
+      <div class="day-tag">Kuala Lumpur</div>
+      <div class="day-title">Day 1: Arrive KL</div>
+      <div class="transport-bar">✈ CX725 12:40→16:40</div>
+      <div class="event">Evening: Jalan Alor street food</div>
+      <div class="food-tag">Char kuey teow · Satay · Durian</div>
+      <div class="hotel-tag">🏨 The Bed KLCC</div>
+    </div>
+
+    <!-- Tue May 5 — Day 2 KL -->
+    <div class="cal-day trip city-kl" onclick="flyTo('kl')">
+      <div class="day-date">5</div>
+      <div class="day-tag">Kuala Lumpur</div>
+      <div class="day-title">Day 2: KL City</div>
+      <div class="event">Batu Caves (morning)</div>
+      <div class="event">Thean Hou Temple 天后宮</div>
+      <div class="event">Petronas Towers + KLCC Park</div>
+      <div class="event">Central Market · Islamic Arts Museum</div>
+      <div class="event">Changkat Bukit Bintang / Heli Bar</div>
+      <div class="hotel-tag">🏨 The Bed KLCC</div>
+    </div>
+
+    <!-- Wed May 6 — Day 3 KL → Penang -->
+    <div class="cal-day trip city-penang" onclick="flyTo('penang')">
+      <div class="day-date">6</div>
+      <div class="day-tag">Penang</div>
+      <div class="day-title">Day 3: KL → Penang</div>
+      <div class="transport-bar">✈ Morning flight ~1h</div>
+      <div class="event">George Town UNESCO heritage walk</div>
+      <div class="event">Khoo Kongsi 邱公司 + Clan Jetties 姓氏橋</div>
+      <div class="event">Street art + Armenian St cafes</div>
+      <div class="event">Cheong Fatt Tze Blue Mansion 張弼士故居</div>
+      <div class="food-tag">Char kuey teow · Assam laksa</div>
+      <div class="flight-tag">Hotel not booked</div>
+    </div>
+
+    <!-- Thu May 7 — Day 4 Penang -->
+    <div class="cal-day trip city-penang" onclick="flyTo('penang')">
+      <div class="day-date">7</div>
+      <div class="day-tag">Penang</div>
+      <div class="day-title">Day 4: Penang Full Day</div>
+      <div class="event">Kek Lok Si Temple 極樂寺</div>
+      <div class="event">Penang Hill funicular</div>
+      <div class="event">Clan Jetties 姓氏橋 (morning)</div>
+      <div class="food-tag">Nasi kandar · Roti canai</div>
+      <div class="flight-tag">Hotel not booked</div>
+    </div>
+
+    <!-- Fri May 8 — Day 5 Penang → HK -->
+    <div class="cal-day trip city-hk" onclick="flyTo('hk')">
+      <div class="day-date">8</div>
+      <div class="day-tag">Hong Kong</div>
+      <div class="day-title">Day 5: Penang → KL → HK</div>
+      <div class="event">Morning: Transfer Rd roti canai</div>
+      <div class="transport-bar">✈ PEN→KUL then CX722 13:10→HKG 17:25</div>
+      <div class="flight-tag">Hotel not booked</div>
+    </div>
+
+    <!-- Sat May 9 — Free day HK -->
+    <div class="cal-day trip city-hk" onclick="flyTo('hk')">
+      <div class="day-date">9</div>
+      <div class="day-tag">Hong Kong</div>
+      <div class="day-title">Buffer Day</div>
+      <div class="event">Free day in HK</div>
+      <div class="event">Last-minute shopping / rest</div>
+      <div class="flight-tag">Hotel not booked</div>
+    </div>
+  </div>
+
+  <!-- Week 3: Sun May 10 – Sat May 16 -->
+  <div class="week-label">Week of May 10</div>
+  <div class="calendar">
+    <!-- Sun May 10 — Fly home -->
+    <div class="cal-day trip city-flight" onclick="flyTo('hk')">
+      <div class="day-date">10</div>
+      <div class="day-tag">✈ Flight</div>
+      <div class="day-title">HKG → SFO</div>
+      <div class="event">CX870 departs 13:25</div>
+      <div class="event">Arrive SFO 10:55 same day</div>
+      <div class="flight-tag">Seat 50D</div>
+    </div>
+    <div class="cal-day empty"><div class="day-date">11</div></div>
+    <div class="cal-day empty"><div class="day-date">12</div></div>
+    <div class="cal-day empty"><div class="day-date">13</div></div>
+    <div class="cal-day empty"><div class="day-date">14</div></div>
+    <div class="cal-day empty"><div class="day-date">15</div></div>
+    <div class="cal-day empty"><div class="day-date">16</div></div>
+  </div>
+
+  <!-- List View -->
+  <h3 class="section-title">📋 Day-by-Day Itinerary</h3>
+  <div class="list-view">
+
+    <div class="list-item" style="--city-color: #dc2626; background: #fef2f2;" data-city="sfo" onclick="flyTo('sfo')">
+      <div class="list-content">
+        <div class="list-date-tag">Day 1 · Wed, Apr 30 · ✈ Flight</div>
+        <div class="list-title">SFO → Hong Kong</div>
+        <div class="list-desc">CX873 departs 00:20 · 14h 55m · Seat 52C</div>
+      </div>
+      <div class="list-desc">Terminal I → Terminal 1</div>
+    </div>
+
+    <div class="list-item" style="--city-color: #6366f1; background: #f8f7ff;" data-city="hk" onclick="flyTo('hk')">
+      <div class="list-content" style="width:100%;">
+        <div class="list-date-tag">Day 2 · Thu, May 1 · Hong Kong</div>
+        <div class="list-title">Arrive Hong Kong</div>
+        <div class="list-desc">Land at HKG 06:15 · Check in at Harbour Grand Hong Kong · Rest, explore</div>
+        <div class="hotel-tag">🏨 Harbour Grand Hong Kong · Check-in 15:00</div>
+
+        <button class="toggle-details" onclick="event.stopPropagation(); toggleDetails(this, 'day2-details');">
+          <span class="arrow">&#9654;</span>
+          <span class="label">Show details</span>
+        </button>
+
+        <div class="expandable" id="day2-details">
+          <div class="city-walk">
+
+            <div class="cw-period">🌅 Morning (9:00 – 12:30)</div>
+
+            <div class="cw-stop">
+              <span class="cw-time">9:00</span>
+              <div>
+                <div class="cw-name">Lin Heung Tea House <span class="cn">(蓮香樓)</span></div>
+                <div class="cw-desc">Classic dim sum parlor with cart service in Sheung Wan. Old-school HK experience — get there early, locals queue.</div>
+                <span class="cw-tag cw-food">Food</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">10:00</span>
+              <div>
+                <div class="cw-name">Hong Kong Museum of History <span class="cn">(香港歷史博物館)</span></div>
+                <div class="cw-desc">MTR to Tsim Sha Tsui. "Hong Kong Story" permanent exhibition — 400M years of natural history through the handover. Allow ~2 hours.</div>
+                <span class="cw-tag cw-museum">Museum</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">12:00</span>
+              <div>
+                <div class="cw-name">Tsim Sha Tsui Promenade</div>
+                <div class="cw-desc">Victoria Harbour waterfront, Clock Tower (1915 KCR railway relic), Avenue of Stars.</div>
+                <span class="cw-tag cw-walk">Walk</span>
+              </div>
+            </div>
+
+            <div class="cw-period">☀️ Afternoon (12:30 – 17:30)</div>
+
+            <div class="cw-stop">
+              <span class="cw-time">12:30</span>
+              <div>
+                <div class="cw-name">Mak's Noodle / Tsim Chai Kee <span class="cn">(中環)</span></div>
+                <div class="cw-desc">Star Ferry across to Central (HK$3 — an experience itself). Wonton noodles in a no-frills shop.</div>
+                <span class="cw-tag cw-food">Food</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">13:30</span>
+              <div>
+                <div class="cw-name">PMQ <span class="cn">(元創方)</span></div>
+                <div class="cw-desc">Former Police Married Quarters on Hollywood Road, now creative arts hub. Free — galleries, design studios, rotating exhibitions.</div>
+                <span class="cw-tag cw-culture">Culture</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">14:00</span>
+              <div>
+                <div class="cw-name">Hollywood Road & Sheung Wan</div>
+                <div class="cw-desc">Man Mo Temple (1847, incense coils, Taoist/Buddhist), antique shops, dried seafood street on Des Voeux Road West.</div>
+                <span class="cw-tag cw-culture">Culture</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">15:30</span>
+              <div>
+                <div class="cw-name">Dr Sun Yat-sen Museum <span class="cn">(孫中山紀念館)</span></div>
+                <div class="cw-desc">Kom Tong Hall (Edwardian, declared monument). Sun's ties to HK and the revolutionary movement.</div>
+                <span class="cw-tag cw-museum">Museum</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">16:30</span>
+              <div>
+                <div class="cw-name">Tai Kwun Centre for Heritage and Arts <span class="cn">(大館)</span></div>
+                <div class="cw-desc">Former Central Police Station (1841–2006). Three declared monuments, contemporary art galleries (free), judicial history exhibits.</div>
+                <span class="cw-tag cw-museum">Museum</span>
+              </div>
+            </div>
+
+            <div class="cw-period">🌆 Evening (17:30 – 21:00)</div>
+
+            <div class="cw-stop">
+              <span class="cw-time">17:30</span>
+              <div>
+                <div class="cw-name">Wan Chai Heritage Trail</div>
+                <div class="cw-desc">Tram from Central. Blue House Cluster (Grade 1 historic tenement, living museum), Pak Tai Temple (1863), old market streets.</div>
+                <span class="cw-tag cw-culture">Culture</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">18:30</span>
+              <div>
+                <div class="cw-name">Ser Wong Fun <span class="cn">(蛇王芬)</span></div>
+                <div class="cw-desc">Operating since 1895 — snake soup, clay pot rice, old HK comfort food. Alt: Under Bridge Spicy Crab for typhoon shelter crab.</div>
+                <span class="cw-tag cw-food">Food</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">20:00</span>
+              <div>
+                <div class="cw-name">Symphony of Lights / Night Tram Ride</div>
+                <div class="cw-desc">8pm light show from TST waterfront, or ding-ding tram end-to-end through neon-lit Wan Chai → North Point. Nightcap at a dai pai dong.</div>
+                <span class="cw-tag cw-walk">Walk</span>
+              </div>
+            </div>
+
+            <div class="cw-tips">
+              <div class="cw-tips-title">Tips</div>
+              <ul>
+                <li><strong>Octopus card</strong> — covers MTR, trams, Star Ferry, 7-Eleven</li>
+                <li><strong>Museum hours</strong> — most close Tuesdays; check before going</li>
+                <li><strong>Weather</strong> — early May is warm & humid, carry water and umbrella</li>
+                <li><strong>Free admission</strong> — Tai Kwun, PMQ, and some Museum of History exhibits</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="list-item" style="--city-color: #6366f1; background: #f8f7ff;" data-city="hk" onclick="flyTo('hk')">
+      <div class="list-content">
+        <div class="list-date-tag">Day 3 · Fri, May 2 · Hong Kong</div>
+        <div class="list-title">Hong Kong</div>
+        <div class="list-desc">Culture + nature day</div>
+        <div class="hotel-tag">🏨 Harbour Grand Hong Kong</div>
+      </div>
+    </div>
+
+    <div class="list-item" style="--city-color: #6366f1; background: #f8f7ff;" data-city="hk" onclick="flyTo('hk')">
+      <div class="list-content" style="width:100%;">
+        <div class="list-date-tag">Day 4 · Sat, May 3 · Hong Kong / Macau</div>
+        <div class="list-title">Hong Kong / Macau</div>
+        <div class="list-desc">Day trip to Macau — UNESCO Historic Centre, museums, Portuguese egg tarts · Check out by 12:00</div>
+        <div class="hotel-tag">🏨 Harbour Grand Hong Kong · Check-out 12:00</div>
+
+        <button class="toggle-details" onclick="event.stopPropagation(); toggleDetails(this, 'day4-details');">
+          <span class="arrow">&#9654;</span>
+          <span class="label">Show details</span>
+        </button>
+
+        <div class="expandable" id="day4-details">
+          <div class="city-walk">
+
+            <div class="cw-period">🌅 Morning (7:00 – 12:00)</div>
+
+            <div class="cw-stop">
+              <span class="cw-time">7:00</span>
+              <div>
+                <div class="cw-name">Ferry to Macau</div>
+                <div class="cw-desc">TurboJET from Sheung Wan (Shun Tak Centre) to Macau Outer Harbour. ~55 min. Book in advance on weekends.</div>
+                <span class="cw-tag cw-walk">Transport</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">8:15</span>
+              <div>
+                <div class="cw-name">Breakfast: Margaret's Cafe e Nata <span class="cn">(瑪嘉烈蛋撻)</span></div>
+                <div class="cw-desc">The original Portuguese egg tart in Macau. Flaky pastry, caramelised custard. Tiny shop near Senado Square — cash only.</div>
+                <span class="cw-tag cw-food">Food</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">9:00</span>
+              <div>
+                <div class="cw-name">Ruins of St. Paul's <span class="cn">(大三巴牌坊)</span></div>
+                <div class="cw-desc">Iconic 1602 church facade — UNESCO World Heritage. Adjacent Museum of Sacred Art in the crypt has religious artifacts and bones of Japanese/Vietnamese martyrs.</div>
+                <span class="cw-tag cw-museum">Museum</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">9:45</span>
+              <div>
+                <div class="cw-name">Monte Fort & Macau Museum <span class="cn">(大炮台 · 澳門博物館)</span></div>
+                <div class="cw-desc">17th-century fortress with panoramic views. The museum inside covers 400 years of Macau's East-meets-West history — Portuguese colonisation, Chinese traditions, multicultural daily life.</div>
+                <span class="cw-tag cw-museum">Museum</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">11:00</span>
+              <div>
+                <div class="cw-name">Senado Square & Holy House of Mercy <span class="cn">(議事亭前地)</span></div>
+                <div class="cw-desc">Wave-patterned Portuguese pavement, pastel neoclassical buildings. Holy House of Mercy (1569) is one of Asia's oldest charitable institutions — small museum upstairs.</div>
+                <span class="cw-tag cw-culture">Culture</span>
+              </div>
+            </div>
+
+            <div class="cw-period">☀️ Afternoon (12:00 – 17:00)</div>
+
+            <div class="cw-stop">
+              <span class="cw-time">12:00</span>
+              <div>
+                <div class="cw-name">Lunch: Restaurante Litoral Taipa <span class="cn">(海灣餐廳 · 氹仔)</span></div>
+                <div class="cw-desc">Portuguese & cha chaan teng fare in Taipa Old Village (氹仔舊城區). $101-200 MOP range. Note: check opening hours — may be closed at certain times (休息中).</div>
+                <span class="cw-tag cw-food">Food</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">13:30</span>
+              <div>
+                <div class="cw-name">Mandarin's House <span class="cn">(鄭家大屋)</span></div>
+                <div class="cw-desc">1869 compound of writer Zheng Guanying — largest traditional Chinese residential complex in Macau. Free entry. Beautiful courtyard blending Chinese and Western architecture.</div>
+                <span class="cw-tag cw-culture">Culture</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">14:15</span>
+              <div>
+                <div class="cw-name">A-Ma Temple <span class="cn">(媽閣廟)</span></div>
+                <div class="cw-desc">Oldest temple in Macau (1488), dedicated to the sea goddess Mazu. Macau's name derives from "A-Ma-Gao." Incense-filled halls built into the hillside.</div>
+                <span class="cw-tag cw-culture">Culture</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">14:45</span>
+              <div>
+                <div class="cw-name">Maritime Museum <span class="cn">(海事博物館)</span></div>
+                <div class="cw-desc">Right next to A-Ma Temple. Covers Macau's seafaring history, Chinese junk boats, Portuguese Age of Discovery. Small but well curated.</div>
+                <span class="cw-tag cw-museum">Museum</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">15:30</span>
+              <div>
+                <div class="cw-name">Taipa Village <span class="cn">(氹仔舊城區)</span></div>
+                <div class="cw-desc">Bus or taxi to Taipa. Walk Rua do Cunha (Food Street) — pork chop buns, almond cookies, serradura. Visit Taipa Houses Museum (colonial Portuguese villas turned museum).</div>
+                <span class="cw-tag cw-culture">Culture</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">16:15</span>
+              <div>
+                <div class="cw-name">Snack: Lord Stow's Bakery (Taipa) <span class="cn">(安德魯餅店)</span></div>
+                <div class="cw-desc">The other legendary egg tart — Lord Stow's originated in Coloane. Creamy English-style custard in a flaky shell. Compare with Margaret's from this morning.</div>
+                <span class="cw-tag cw-food">Food</span>
+              </div>
+            </div>
+
+            <div class="cw-period">🌆 Evening (17:00 – 20:30)</div>
+
+            <div class="cw-stop">
+              <span class="cw-time">17:00</span>
+              <div>
+                <div class="cw-name">Cotai Strip Walk</div>
+                <div class="cw-desc">Stroll past the Venetian, Parisian, and City of Dreams. Over-the-top architecture worth seeing even if you don't gamble. Free entry to lobbies.</div>
+                <span class="cw-tag cw-walk">Walk</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">18:00</span>
+              <div>
+                <div class="cw-name">Dinner: Chan Seng Kei <span class="cn">(陳勝記)</span></div>
+                <div class="cw-desc">In Coloane Village — known for slow-braised bone marrow and traditional Macanese dishes. Or try Nga Tim Cafe on the same Coloane square for a casual Macanese meal outdoors.</div>
+                <span class="cw-tag cw-food">Food</span>
+              </div>
+            </div>
+
+            <div class="cw-stop">
+              <span class="cw-time">19:30</span>
+              <div>
+                <div class="cw-name">Ferry back to Hong Kong</div>
+                <div class="cw-desc">TurboJET from Taipa Ferry Terminal back to HK. ~60 min. Last ferries run until ~23:00. Arrive Sheung Wan by ~20:30.</div>
+                <span class="cw-tag cw-walk">Transport</span>
+              </div>
+            </div>
+
+            <div class="cw-tips">
+              <div class="cw-tips-title">Tips</div>
+              <ul>
+                <li><strong>Currency</strong> — Macau Pataca (MOP), but HKD accepted everywhere at 1:1</li>
+                <li><strong>Ferry</strong> — book TurboJET in advance for weekends; ~HK$175 one way</li>
+                <li><strong>Getting around</strong> — Macau peninsula is walkable; bus/taxi to Taipa & Coloane</li>
+                <li><strong>Free shuttles</strong> — casino shuttle buses run from ferry terminal to Cotai Strip</li>
+                <li><strong>UNESCO</strong> — 30+ sites in the Historic Centre are World Heritage listed</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="list-item" style="--city-color: #38bdf8; background: #f0f9ff;" data-city="kl" onclick="flyTo('kl')">
+      <div class="list-content">
+        <div class="list-date-tag">Day 5 · Mon, May 4 · Kuala Lumpur</div>
+        <div class="list-title">Arrive Kuala Lumpur</div>
+        <div class="list-desc">CX725 HKG 12:40 → KUL 16:40 · Seat 71C · Evening: Jalan Alor street food</div>
+        <div class="hotel-tag">🏨 The Bed KLCC · Check-in 15:00</div>
+      </div>
+    </div>
+
+    <div class="list-item" style="--city-color: #38bdf8; background: #f0f9ff;" data-city="kl" onclick="flyTo('kl')">
+      <div class="list-content">
+        <div class="list-date-tag">Day 6 · Tue, May 5 · Kuala Lumpur</div>
+        <div class="list-title">KL Full Day</div>
+        <div class="list-desc">Batu Caves (morning) · Thean Hou Temple 天后宮 · Petronas Towers + KLCC Park · Central Market · Islamic Arts Museum · Changkat Bukit Bintang</div>
+        <div class="hotel-tag">🏨 The Bed KLCC</div>
+      </div>
+    </div>
+
+    <div class="list-item" style="--city-color: #059669; background: #f5fdf9;" data-city="penang" onclick="flyTo('penang')">
+      <div class="list-content">
+        <div class="list-date-tag">Day 7 · Wed, May 6 · Penang</div>
+        <div class="list-title">KL → Penang</div>
+        <div class="list-desc">✈ Morning flight ~1h · George Town UNESCO heritage walk · Khoo Kongsi 邱公司 + Clan Jetties 姓氏橋 · Street art + Armenian St · Cheong Fatt Tze Blue Mansion 張弼士故居</div>
+        <div class="flight-tag">Hotel not booked</div>
+      </div>
+    </div>
+
+    <div class="list-item" style="--city-color: #059669; background: #f5fdf9;" data-city="penang" onclick="flyTo('penang')">
+      <div class="list-content">
+        <div class="list-date-tag">Day 8 · Thu, May 7 · Penang</div>
+        <div class="list-title">Penang Full Day</div>
+        <div class="list-desc">Kek Lok Si Temple 極樂寺 · Penang Hill funicular · Clan Jetties 姓氏橋 (morning) · Nasi kandar, roti canai</div>
+        <div class="flight-tag">Hotel not booked</div>
+      </div>
+    </div>
+
+    <div class="list-item" style="--city-color: #6366f1; background: #f8f7ff;" data-city="hk" onclick="flyTo('hk')">
+      <div class="list-content">
+        <div class="list-date-tag">Day 9 · Fri, May 8 · Hong Kong</div>
+        <div class="list-title">Penang → KL → Hong Kong</div>
+        <div class="list-desc">Morning: Transfer Rd roti canai · ✈ PEN → KUL · CX722 KUL 13:10 → HKG 17:25</div>
+        <div class="flight-tag">Hotel not booked</div>
+      </div>
+    </div>
+
+    <div class="list-item" style="--city-color: #6366f1; background: #f8f7ff;" data-city="hk" onclick="flyTo('hk')">
+      <div class="list-content">
+        <div class="list-date-tag">Day 10 · Sat, May 9 · Hong Kong</div>
+        <div class="list-title">Buffer Day</div>
+        <div class="list-desc">Free day in Hong Kong · Last-minute shopping / rest</div>
+        <div class="flight-tag">Hotel not booked</div>
+      </div>
+    </div>
+
+    <div class="list-item" style="--city-color: #dc2626; background: #fef2f2;" data-city="hk" onclick="flyTo('hk')">
+      <div class="list-content">
+        <div class="list-date-tag">Day 11 · Sun, May 10 · ✈ Flight</div>
+        <div class="list-title">Hong Kong → SFO</div>
+        <div class="list-desc">CX870 departs 13:25 · Arrive SFO 10:55 same day · Seat 50D</div>
+      </div>
+      <div class="list-desc">Terminal 1 → Terminal I</div>
+    </div>
+
+  </div>
+
+  <!-- Flights -->
+  <h3 class="section-title">✈️ Flights — Cathay Pacific</h3>
+  <div class="flight-info">
+    <div>
+      <div class="flight-num">CX873 · Seat 52C</div>
+      <div class="route">SFO → HKG</div>
+      <div class="details">Depart Apr 30, 00:20 · Arrive May 1, 06:15 · 14h 55m</div>
+    </div>
+    <div class="details">Terminal I → Terminal 1</div>
+  </div>
+  <div class="flight-info" style="border-left-color: #38bdf8;">
+    <div>
+      <div class="flight-num" style="color: #38bdf8;">CX725 · Seat 71C</div>
+      <div class="route">HKG → KUL</div>
+      <div class="details">Depart May 4, 12:40 · Arrive May 4, 16:40 · 4h</div>
+    </div>
+    <div class="details">Terminal 1 → Terminal 1</div>
+  </div>
+  <div class="flight-info" style="border-left-color: #38bdf8;">
+    <div>
+      <div class="flight-num" style="color: #38bdf8;">CX722</div>
+      <div class="route">KUL → HKG</div>
+      <div class="details">Depart May 8, 13:10 · Arrive May 8, 17:25 · 4h 15m</div>
+    </div>
+    <div class="details">Terminal 1 → Terminal 1</div>
+  </div>
+  <div class="flight-info">
+    <div>
+      <div class="flight-num">CX870 · Seat 50D</div>
+      <div class="route">HKG → SFO</div>
+      <div class="details">Depart May 10, 13:25 · Arrive May 10, 10:55 · Same day arrival</div>
+    </div>
+    <div class="details">Terminal 1 → Terminal I</div>
+  </div>
+
+  <!-- Accommodations -->
+  <h3 class="section-title">🏨 Accommodations</h3>
+  <div class="flight-info" style="border-left-color: #6366f1;">
+    <div>
+      <div class="flight-num" style="color: #6366f1;">Hong Kong · Booking 1 · 2 nights</div>
+      <div class="route">Harbour Grand Hong Kong ⭐⭐⭐⭐⭐</div>
+      <div class="details">23 Oil Street, North Point, Eastern District, Hong Kong</div>
+      <div class="details">Check-in: May 1, 15:00 · Check-out: May 3, 12:00</div>
+    </div>
+    <div>
+      <div class="details">📞 +852-21212688</div>
+    </div>
+  </div>
+  <div class="flight-info" style="border-left-color: #6366f1;">
+    <div>
+      <div class="flight-num" style="color: #6366f1;">Hong Kong · Booking 2 · 1 night</div>
+      <div class="route">Harbour Grand Hong Kong ⭐⭐⭐⭐⭐</div>
+      <div class="details">23 Oil Street, North Point, Eastern District, Hong Kong</div>
+      <div class="details">Check-in: May 3, 15:00 · Check-out: May 4, 12:00</div>
+    </div>
+    <div>
+      <div class="details">📞 +852-21212688</div>
+    </div>
+  </div>
+  <div class="flight-info" style="border-left-color: #38bdf8;">
+    <div>
+      <div class="flight-num" style="color: #38bdf8;">Kuala Lumpur · 2 nights</div>
+      <div class="route">The Bed KLCC</div>
+      <div class="details">12 Jalan Sultan Ismail, 50250 Kuala Lumpur, Malaysia</div>
+      <div class="details">Check-in: May 4, 15:00 · Check-out: May 6</div>
+    </div>
+  </div>
+
+  <!-- Food Guide -->
+  <h3 class="section-title">🍜 Don't Miss Eating</h3>
+
+  <div class="food-region"><span class="fr-dot" style="background:#6366f1;"></span> Hong Kong & Macau</div>
+  <div class="food-grid">
+    <div class="food-card fhk">
+      <div class="food-icon"><span class="icon-emoji">🍞</span><span class="icon-label-cn">菠蘿包</span><span class="icon-label">Pineapple Bun</span></div>
+      <div class="dish">Pineapple Bun 菠蘿包</div>
+      <div class="where">Hong Kong — Kam Wah Cafe, Mong Kok</div>
+    </div>
+    <div class="food-card fhk">
+      <div class="food-icon"><span class="icon-emoji">🍜</span><span class="icon-label-cn">雲吞麵</span><span class="icon-label">Wonton Noodles</span></div>
+      <div class="dish">Wonton Noodles 雲吞麵</div>
+      <div class="where">Hong Kong — Mak's Noodle, Central</div>
+    </div>
+    <div class="food-card fhk">
+      <div class="food-icon"><span class="icon-emoji">🧇</span><span class="icon-label-cn">雞蛋仔</span><span class="icon-label">Egg Waffle</span></div>
+      <div class="dish">Egg Waffle 雞蛋仔</div>
+      <div class="where">Hong Kong — Lee Keung Kee, North Point</div>
+    </div>
+    <div class="food-card fhk">
+      <div class="food-icon"><span class="icon-emoji">🥟</span><span class="icon-label-cn">點心</span><span class="icon-label">Dim Sum</span></div>
+      <div class="dish">Dim Sum 點心</div>
+      <div class="where">Hong Kong — Lin Heung Tea House, Sheung Wan</div>
+    </div>
+    <div class="food-card fhk">
+      <div class="food-icon"><span class="icon-emoji">🍗</span><span class="icon-label-cn">燒鵝</span><span class="icon-label">Roast Goose</span></div>
+      <div class="dish">Roast Goose 燒鵝</div>
+      <div class="where">Hong Kong — Yat Lok, Central</div>
+    </div>
+    <div class="food-card fhk">
+      <div class="food-icon"><span class="icon-emoji">🫖</span><span class="icon-label-cn">絲襪奶茶</span><span class="icon-label">Milk Tea</span></div>
+      <div class="dish">Milk Tea 絲襪奶茶</div>
+      <div class="where">Hong Kong — Lan Fong Yuen, Central</div>
+    </div>
+    <div class="food-card fhk">
+      <div class="food-icon"><span class="icon-emoji">🍲</span><span class="icon-label-cn">牛腩麵</span><span class="icon-label">Beef Brisket Noodles</span></div>
+      <div class="dish">Beef Brisket Noodles 牛腩麵</div>
+      <div class="where">Hong Kong — Kau Kee, Central</div>
+    </div>
+    <div class="food-card fhk">
+      <div class="food-icon"><span class="icon-emoji">🥧</span><span class="icon-label-cn">蛋撻</span><span class="icon-label">Egg Tart</span></div>
+      <div class="dish">Portuguese Egg Tart 蛋撻</div>
+      <div class="where">Macau — Margaret's Cafe e Nata</div>
+    </div>
+  </div>
+
+  <div class="food-region"><span class="fr-dot" style="background:#38bdf8;"></span> Malaysia</div>
+  <div class="food-grid">
+    <div class="food-card fkl">
+      <div class="food-icon"><span class="icon-emoji">🍚</span><span class="icon-label-cn">椰漿飯</span><span class="icon-label">Nasi Lemak</span></div>
+      <div class="dish">Nasi Lemak</div>
+      <div class="where">Kuala Lumpur — Village Park, Bangsar</div>
+    </div>
+    <div class="food-card fpen">
+      <div class="food-icon"><span class="icon-emoji">🍳</span><span class="icon-label-cn">炒粿條</span><span class="icon-label">Char Kuey Teow</span></div>
+      <div class="dish">Char Kuey Teow</div>
+      <div class="where">Penang — New Lane / Lorong Selamat</div>
+    </div>
+    <div class="food-card fpen">
+      <div class="food-icon"><span class="icon-emoji">🥘</span><span class="icon-label-cn">亞參叻沙</span><span class="icon-label">Assam Laksa</span></div>
+      <div class="dish">Assam Laksa</div>
+      <div class="where">Penang — Air Itam Market</div>
+    </div>
+    <div class="food-card fpen">
+      <div class="food-icon"><span class="icon-emoji">🫓</span><span class="icon-label-cn">印度煎餅</span><span class="icon-label">Roti Canai</span></div>
+      <div class="dish">Roti Canai</div>
+      <div class="where">Penang — Transfer Road</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">Hong Kong + Malaysia — Apr 30 – May 10, 2026 — SFO → Hong Kong → Kuala Lumpur → Penang → Hong Kong → SFO</div>
+
+<script>
+function toggleDetails(btn, id) {
+  var el = document.getElementById(id);
+  var arrow = btn.querySelector('.arrow');
+  var label = btn.querySelector('.label');
+  var opening = !el.classList.contains('open');
+
+  if (opening) {
+    el.classList.add('open');
+    el.style.maxHeight = el.scrollHeight + 'px';
+    var items = el.querySelectorAll('.cw-stop, .cw-period, .cw-tips');
+    items.forEach(function(item, i) {
+      item.style.transitionDelay = (i * 0.04) + 's';
+    });
+    el.addEventListener('transitionend', function handler() {
+      if (el.classList.contains('open')) el.style.maxHeight = 'none';
+      el.removeEventListener('transitionend', handler);
+    });
+  } else {
+    el.style.maxHeight = el.scrollHeight + 'px';
+    requestAnimationFrame(function() {
+      el.style.maxHeight = '0px';
+      el.classList.remove('open');
+      var items = el.querySelectorAll('.cw-stop, .cw-period, .cw-tips');
+      items.forEach(function(item) { item.style.transitionDelay = '0s'; });
+    });
+  }
+
+  arrow.classList.toggle('open', opening);
+  label.textContent = opening ? 'Hide details' : 'Show details';
+}
+</script>
+
+</body>
+</html>
