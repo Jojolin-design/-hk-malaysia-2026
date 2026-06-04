@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- 
+
 <!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -19,7 +19,7 @@ fbq('track', 'PageView');
 src="https://www.facebook.com/tr?id=787358951684721&ev=PageView&noscript=1"
 /></noscript>
 <!-- End Meta Pixel Code -->
- 
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HK + Malaysia Trip — May 2026</title>
@@ -378,6 +378,72 @@ src="https://www.facebook.com/tr?id=787358951684721&ev=PageView&noscript=1"
   .cw-tips-title { font-size: 12px; font-weight: 700; color: #6366f1; margin-bottom: 4px; }
   .cw-tips ul { padding-left: 16px; margin: 0; }
   .cw-tips li { font-size: 12px; color: #666; margin-bottom: 2px; line-height: 1.5; }
+
+  .cta-section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+  }
+  .cta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .cta-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .cta-card .cta-icon { font-size: 2rem; }
+  .cta-card .cta-title { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+  .cta-card .cta-desc { font-size: 13px; color: #666; line-height: 1.5; }
+  .cta-card .cta-price { font-size: 20px; font-weight: 700; color: #0f3460; }
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .cta-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  .cta-btn:active { transform: translateY(0); }
+  .btn-cart { background: #38bdf8; color: white; }
+  .btn-purchase { background: #059669; color: white; }
+  .btn-like { background: white; color: #dc2626; border: 2px solid #fecaca; }
+  .btn-like.liked { background: #fef2f2; border-color: #dc2626; }
+  .btn-subscribe { background: #6366f1; color: white; }
+  .btn-lead { background: #ea580c; color: white; }
+  .btn-search { background: #1a1a2e; color: white; }
+  .cta-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .cta-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #1a1a2e;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    z-index: 1000;
+  }
+  .cta-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
@@ -1069,6 +1135,88 @@ src="https://www.facebook.com/tr?id=787358951684721&ev=PageView&noscript=1"
 
 </div>
 
+<!-- CTA Section for Meta Pixel Testing -->
+<div class="cta-section">
+  <h3 class="section-title">🛒 Travel Packages & Extras</h3>
+  <div class="cta-grid">
+
+    <div class="cta-card">
+      <div class="cta-icon">🎒</div>
+      <div class="cta-title">Hong Kong City Pass</div>
+      <div class="cta-desc">3-day unlimited MTR, Star Ferry, Peak Tram, and free entry to 5 museums.</div>
+      <div class="cta-price">$89</div>
+      <div class="cta-actions">
+        <button class="cta-btn btn-cart" onclick="handleAddToCart('Hong Kong City Pass', 89, 'HK-PASS-001')">🛒 Add to Cart</button>
+        <button class="cta-btn btn-like" onclick="handleLike(this, 'Hong Kong City Pass')">♡ Like</button>
+      </div>
+    </div>
+
+    <div class="cta-card">
+      <div class="cta-icon">🍜</div>
+      <div class="cta-title">Penang Food Tour</div>
+      <div class="cta-desc">Guided half-day street food crawl through George Town — 8 stops, all tastings included.</div>
+      <div class="cta-price">$45</div>
+      <div class="cta-actions">
+        <button class="cta-btn btn-cart" onclick="handleAddToCart('Penang Food Tour', 45, 'PEN-FOOD-002')">🛒 Add to Cart</button>
+        <button class="cta-btn btn-purchase" onclick="handlePurchase('Penang Food Tour', 45, 'PEN-FOOD-002')">💳 Purchase</button>
+      </div>
+    </div>
+
+    <div class="cta-card">
+      <div class="cta-icon">🏨</div>
+      <div class="cta-title">KL Hotel Upgrade</div>
+      <div class="cta-desc">Upgrade to Petronas Twin Towers view suite at The Bed KLCC. Includes breakfast.</div>
+      <div class="cta-price">$120/night</div>
+      <div class="cta-actions">
+        <button class="cta-btn btn-purchase" onclick="handlePurchase('KL Hotel Upgrade', 240, 'KL-HOTEL-003')">💳 Purchase</button>
+        <button class="cta-btn btn-like" onclick="handleLike(this, 'KL Hotel Upgrade')">♡ Like</button>
+      </div>
+    </div>
+
+    <div class="cta-card">
+      <div class="cta-icon">📧</div>
+      <div class="cta-title">Travel Newsletter</div>
+      <div class="cta-desc">Weekly deals on Asia flights, hotel bundles, and hidden gem restaurants.</div>
+      <div class="cta-actions">
+        <button class="cta-btn btn-subscribe" onclick="handleSubscribe()">🔔 Subscribe</button>
+      </div>
+    </div>
+
+    <div class="cta-card">
+      <div class="cta-icon">🎫</div>
+      <div class="cta-title">Macau Day Trip Bundle</div>
+      <div class="cta-desc">Round-trip TurboJET ferry + Macau Tower entry + Portuguese lunch set.</div>
+      <div class="cta-price">$135</div>
+      <div class="cta-actions">
+        <button class="cta-btn btn-cart" onclick="handleAddToCart('Macau Day Trip Bundle', 135, 'MAC-TRIP-004')">🛒 Add to Cart</button>
+        <button class="cta-btn btn-purchase" onclick="handlePurchase('Macau Day Trip Bundle', 135, 'MAC-TRIP-004')">💳 Purchase</button>
+        <button class="cta-btn btn-like" onclick="handleLike(this, 'Macau Day Trip Bundle')">♡ Like</button>
+      </div>
+    </div>
+
+    <div class="cta-card">
+      <div class="cta-icon">🔍</div>
+      <div class="cta-title">Search Flights</div>
+      <div class="cta-desc">Find the best prices on Cathay Pacific flights to Hong Kong and Malaysia.</div>
+      <div class="cta-actions">
+        <button class="cta-btn btn-search" onclick="handleSearch()">🔍 Search Flights</button>
+      </div>
+    </div>
+
+    <div class="cta-card">
+      <div class="cta-icon">📋</div>
+      <div class="cta-title">Free Travel Checklist</div>
+      <div class="cta-desc">Download our packing list + visa requirements guide for HK & Malaysia.</div>
+      <div class="cta-actions">
+        <button class="cta-btn btn-lead" onclick="handleLead()">📥 Get Free Guide</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="cta-toast" id="cta-toast"></div>
+
 <div class="footer">Hong Kong + Malaysia — Apr 30 – May 10, 2026 — SFO → Hong Kong → Kuala Lumpur → Penang → Hong Kong → SFO</div>
 
 <script>
@@ -1101,6 +1249,75 @@ function toggleDetails(btn, id) {
 
   arrow.classList.toggle('open', opening);
   label.textContent = opening ? 'Hide details' : 'Show details';
+}
+
+function showToast(msg) {
+  var toast = document.getElementById('cta-toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(function() { toast.classList.remove('show'); }, 2500);
+}
+
+function handleAddToCart(name, price, id) {
+  if (typeof fbq !== 'undefined') {
+    fbq('track', 'AddToCart', {
+      content_name: name,
+      content_ids: [id],
+      content_type: 'product',
+      value: price,
+      currency: 'USD'
+    });
+  }
+  showToast('🛒 Added "' + name + '" to cart — AddToCart event fired');
+}
+
+function handlePurchase(name, price, id) {
+  if (typeof fbq !== 'undefined') {
+    fbq('track', 'Purchase', {
+      content_name: name,
+      content_ids: [id],
+      content_type: 'product',
+      value: price,
+      currency: 'USD'
+    });
+  }
+  showToast('💳 Purchased "' + name + '" — Purchase event fired');
+}
+
+function handleLike(btn, name) {
+  var liked = btn.classList.toggle('liked');
+  btn.innerHTML = liked ? '♥ Liked' : '♡ Like';
+  if (typeof fbq !== 'undefined') {
+    fbq('trackCustom', 'Like', { content_name: name });
+  }
+  showToast((liked ? '♥ Liked' : '♡ Unliked') + ' "' + name + '" — Like event fired');
+}
+
+function handleSubscribe() {
+  if (typeof fbq !== 'undefined') {
+    fbq('track', 'Subscribe', { currency: 'USD', value: 0 });
+  }
+  showToast('🔔 Subscribed — Subscribe event fired');
+}
+
+function handleSearch() {
+  if (typeof fbq !== 'undefined') {
+    fbq('track', 'Search', {
+      search_string: 'Cathay Pacific flights HK Malaysia',
+      content_category: 'flights'
+    });
+  }
+  showToast('🔍 Search triggered — Search event fired');
+}
+
+function handleLead() {
+  if (typeof fbq !== 'undefined') {
+    fbq('track', 'Lead', {
+      content_name: 'Travel Checklist Download',
+      content_category: 'guide'
+    });
+  }
+  showToast('📥 Guide requested — Lead event fired');
 }
 </script>
 
